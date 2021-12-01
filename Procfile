@@ -1,0 +1,1 @@
+web: gunicorn maskapi.wsgi --log-file -
