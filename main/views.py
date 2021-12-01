@@ -19,8 +19,8 @@ class MainApi(generics.GenericAPIView):
             for_masking=for_masking
         )
         mask.save()
-        src1 = str(settings.BASE_DIR) + f"\media\mask\{str(mask_image)}"
-        src2 = str(settings.BASE_DIR) + f"\media\main\{str(for_masking)}"
+        src1 = str(settings.BASE_DIR) + f"/media/mask/{str(mask_image)}"
+        src2 = str(settings.BASE_DIR) + f"/media/main/{str(for_masking)}"
 
         path1 = cv2.imread(src1)
         path2 = cv2.imread(src2)
@@ -38,11 +38,11 @@ class MainApi(generics.GenericAPIView):
         b, g, r = cv2.split(dst)
         rgba = [b,g,r, alpha]
         dst = cv2.merge(rgba,4)
-        cv2.imwrite(f"{str(settings.BASE_DIR)}\media\masked_image.png", dst)
+        cv2.imwrite(f"{str(settings.BASE_DIR)}/media/masked_image.png", dst)
 
         # removing file
-        os.remove(str(settings.BASE_DIR)+f"\media\mask\{mask_image}")
-        os.remove(str(settings.BASE_DIR)+f"\media\main\{for_masking}")
+        os.remove(str(settings.BASE_DIR)+f"/media/mask/{mask_image}")
+        os.remove(str(settings.BASE_DIR)+f"/media/main/{for_masking}")
 
         # removing data
         maskdelete = MaskCategory.objects.filter(pk=mask.pk)
