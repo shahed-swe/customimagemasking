@@ -13,6 +13,8 @@ class MainApi(generics.GenericAPIView):
     def post(self, request, format=None):
         mask_image = request.FILES.get('mask_image')
         for_masking = request.FILES.get('for_masking')
+        user_uid = request.data.get('user_uid')
+        component_type = request.data.get('cmp_type')
 
         mask = MaskCategory(
             mask_image=mask_image,
@@ -38,7 +40,7 @@ class MainApi(generics.GenericAPIView):
         b, g, r = cv2.split(dst)
         rgba = [b,g,r, alpha]
         dst = cv2.merge(rgba,4)
-        cv2.imwrite(f"{str(settings.BASE_DIR)}/media/masked_image.png", dst)
+        cv2.imwrite(f"{str(settings.BASE_DIR)}/media/masked_image{user_uid+component_type}.png", dst)
 
         # removing file
         os.remove(str(settings.BASE_DIR)+f"/media/mask/{mask_image}")
@@ -50,4 +52,11 @@ class MainApi(generics.GenericAPIView):
 
         # getting schema
         schema = request.is_secure() and "https" or "http"
-        return Response({'data':f"{schema}://{request.get_host()}/media/masked_image.png"})
+
+        response_data = {
+            "user_uid": user_uid,
+            "component_type":component_type,
+            "image": f"{schema}://{request.get_host()}/media/masked_image{user_uid+component_type}.png"
+        }
+
+        return Response({'data':response_data})
