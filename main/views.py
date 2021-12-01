@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import serializers, status, generics
 from rest_framework.response import Response
 import cv2
-import numpy as np
+import os
 from .models import MaskCategory
 from django.conf import settings
 
@@ -38,12 +38,16 @@ class MainApi(generics.GenericAPIView):
         b, g, r = cv2.split(dst)
         rgba = [b,g,r, alpha]
         dst = cv2.merge(rgba,4)
-        cv2.imshow('showresult', dst)
-        cv2.imwrite("test.png", dst)
+        cv2.imwrite(f"{str(settings.BASE_DIR)}\media\masked_image.png", dst)
 
+        # removing file
+        os.remove(str(settings.BASE_DIR)+f"\media\mask\{mask_image}")
+        os.remove(str(settings.BASE_DIR)+f"\media\main\{for_masking}")
 
+        # removing data
+        maskdelete = MaskCategory.objects.filter(pk=mask.pk)
+        maskdelete.delete()
 
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
-        return Response({'data':"response"})
+        # getting schema
+        schema = request.is_secure() and "https" or "http"
+        return Response({'data':f"{schema}://{request.get_host()}/media/masked_image.png"})
