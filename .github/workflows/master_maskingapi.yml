@@ -31,7 +31,7 @@ jobs:
         run: pip install -r requirements.txt
       
       - name: Installing Opencv Files
-        run: sudo apt-get install python-opencv
+        run: sudo apt-get update && sudo apt-get install python-opencv
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
       
